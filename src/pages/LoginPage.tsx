@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api/api';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -16,10 +15,9 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
+  
     try {
-      await api.post('/auth/login', { name, email });
-      login({ name, email });
+      await login(name, email); // ✅ this already sends the POST and sets state
       navigate('/search');
     } catch (err) {
       console.error(err);
@@ -28,6 +26,7 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+  
 
   return (
     <>

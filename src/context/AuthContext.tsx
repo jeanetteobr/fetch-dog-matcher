@@ -1,44 +1,57 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import axios from 'axios';
 
-type User = {
-  name: string;
-  email: string;
-};
-
-type AuthContextType = {
-  user: User | null;
+interface AuthContextType {
   isAuthenticated: boolean;
-  login: (user: User) => void;
-  logout: () => void;
-};
+  isLoading: boolean;
+  login: (name: string, email: string) => Promise<void>;
+  logout: () => Promise<void>;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = (user: User) => {
-    setUser(user);
+  // 🔁 Restore auth from localStorage
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    setIsAuthenticated(isLoggedIn);
+    setIsLoading(false);
+  }, []);
+
+  const login = async (name: string, email: string) => {
+    await axios.post(
+      'https://frontend-take-home-service.fetch.com/auth/login',
+      { name, email },
+      { withCredentials: true }
+    );
+    localStorage.setItem('isLoggedIn', 'true');
     setIsAuthenticated(true);
+    console.log('[Auth] Login successful');
   };
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    await axios.post(
+      'https://frontend-take-home-service.fetch.com/auth/logout',
+      {},
+      { withCredentials: true }
+    );
+    localStorage.removeItem('isLoggedIn');
     setIsAuthenticated(false);
+    console.log('[Auth] Logout successful');
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
+  return ctx;
 };

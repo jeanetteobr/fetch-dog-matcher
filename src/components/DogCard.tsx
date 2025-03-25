@@ -18,7 +18,6 @@ export default function DogCard({ dog }: Props) {
     <article
       style={{
         padding: '1rem',
-        backgroundColor: '#1a1a1a',
         borderRadius: '0.75rem',
         color: '#fff',
         position: 'relative',
