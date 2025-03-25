@@ -1,34 +1,25 @@
-import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const { login, logout, user, isAuthenticated } = useAuth();
+
+  const handleFakeLogin = () => {
+    login({ name: 'Testy McTestface', email: 'test@example.com' });
+  };
 
   return (
     <>
       <h1>Welcome to Fetch Dog Matcher 🐶</h1>
-      <p>Start by logging in to find your furry soulmate.</p>
-      <form>
-        <label>
-          Name
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit">Login</button>
-      </form>
+
+      <p><strong>Authenticated:</strong> {isAuthenticated ? '✅ Yes' : '❌ No'}</p>
+      {user && (
+        <p>
+          <strong>User:</strong> {user.name} ({user.email})
+        </p>
+      )}
+
+      <button onClick={handleFakeLogin}>Fake Login</button>
+      <button onClick={logout} style={{ marginLeft: '1rem' }}>Logout</button>
     </>
   );
 }
