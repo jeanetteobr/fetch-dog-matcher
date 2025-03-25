@@ -1,10 +1,19 @@
 import axios from 'axios';
-import { Breed, Dog } from '../types';
+import { Dog, Breed } from '../types';
 
 export const api = axios.create({
   baseURL: 'https://frontend-take-home-service.fetch.com',
   withCredentials: true,
 });
+
+type SortParam = 'breed:asc' | 'breed:desc' | 'name:asc' | 'name:desc' | 'age:asc' | 'age:desc';
+
+interface FetchDogsOptions {
+  breeds?: string[];
+  sort?: SortParam;
+  page?: number;
+  limit?: number;
+}
 
 // Fetch all breeds
 export const fetchBreeds = async (): Promise<Breed[]> => {
@@ -12,22 +21,15 @@ export const fetchBreeds = async (): Promise<Breed[]> => {
   return res.data;
 };
 
-// Fetch dogs w/ pagination, sorting, filtering
-interface FetchDogsOptions {
-  breeds?: string[];
-  sort?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
-}
-
+// Fetch sorted and filtered dogs
 export const fetchDogs = async ({
   breeds,
-  sort = 'asc',
+  sort = 'breed:asc',
   page = 1,
   limit = 25,
 }: FetchDogsOptions): Promise<Dog[]> => {
   const params: Record<string, any> = {
-    sort: `breed:${sort}`,
+    sort,
     page,
     limit,
   };
@@ -36,21 +38,18 @@ export const fetchDogs = async ({
     params.breeds = breeds.join(',');
   }
 
-  // Step 1: Get the IDs
   const searchRes = await api.get('/dogs/search', { params });
   const ids: string[] = searchRes.data.resultIds;
 
-  if (!ids?.length) return [];
+  if (!ids || ids.length === 0) return [];
 
-  // Step 2: Fetch full dog objects
   const dogsRes = await api.post('/dogs', ids);
   const unorderedDogs: Dog[] = dogsRes.data;
 
-  // 🧠 Step 3: Reorder by resultIds
+  // ✨ Reorder dogs to match resultIds
   const ordered = ids
     .map((id) => unorderedDogs.find((dog) => dog.id === id))
-    .filter((d): d is Dog => d !== undefined); // Type guard
+    .filter((d): d is Dog => d !== undefined);
 
   return ordered;
 };
-
