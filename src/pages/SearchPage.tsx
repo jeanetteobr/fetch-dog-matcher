@@ -51,7 +51,8 @@ export default function SearchPage() {
                 setLoading(true);
                 const { dogs: fetchedDogs, total } = await fetchDogs({
                     breeds: selectedBreed ? [selectedBreed] : [],
-                    sort: `${sortField}:${sortOrder}` as unknown,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    sort: `${sortField}:${sortOrder}` as any,
                     page,
                     limit: dogsPerPage,
                 });

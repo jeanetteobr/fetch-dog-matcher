@@ -59,7 +59,6 @@ export default function DogCard({ dog }: Props) {
           color: favorited ? 'red' : 'gray',
           textShadow: '1px 1px 3px rgba(0,0,0,0.6)'
         }}
-        aria-label={favorited ? 'Unfavorite dog' : 'Favorite dog'}
       >
         {favorited ? '❤️' : '🤍'}
       </button>
