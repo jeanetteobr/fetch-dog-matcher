@@ -5,7 +5,7 @@ import { fetchBreeds, fetchDogs, generateMatch } from '../api/api';
 import { Dog, Breed } from '../types';
 import DogCard from '../components/DogCard';
 import MatchCard from '../components/MatchCard';
-import { useFavorites }from '../context/FavoritesContext';
+import { useFavorites } from '../context/FavoritesContext';
 
 export default function SearchPage() {
     const { isAuthenticated } = useAuth();
@@ -90,7 +90,14 @@ export default function SearchPage() {
 
     return (
         <>
-            <h1>Dog Browser 🐾</h1>
+            <h2>Find Your Pack 🐕</h2>
+            <p style={{ marginBottom: '1rem' }}>
+                Filter by breed, sort by age or name, and add your favorites. When you’re ready, we’ll sniff out your perfect match. 💘
+            </p>
+
+            <blockquote style={{ fontStyle: 'italic', color: '#aaa' }}>
+                “You can’t buy love, but you can rescue it.” – Unknown
+            </blockquote>
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {favorites.length > 0 && (
@@ -187,6 +194,13 @@ export default function SearchPage() {
             </form>
 
             {loading && <p>Loading dogs...</p>}
+
+            {favorites.length === 0 && (
+                <p style={{ marginTop: '1rem', color: '#999' }}>
+                    You haven’t picked any favorites yet! Don’t worry, we won’t tell the dogs. 🐶
+                </p>
+            )}
+
 
             <section
                 style={{

@@ -15,7 +15,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-  
+
     try {
       await login(name, email); // ✅ this already sends the POST and sets state
       navigate('/search');
@@ -26,11 +26,14 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
-  
+
 
   return (
     <>
       <h1>Welcome to Fetch Dog Matcher 🐶</h1>
+      <p style={{ marginBottom: '1rem', fontStyle: 'italic', color: '#888' }}>
+        "Every dog has its day. Let's find yours." 🦴
+      </p>
       <form onSubmit={handleSubmit}>
         <label>
           Name
@@ -51,7 +54,7 @@ export default function LoginPage() {
           />
         </label>
         <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? 'Sniffing out your account...' : 'Sniff In! 🐾'}
         </button>
       </form>
 

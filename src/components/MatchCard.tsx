@@ -30,6 +30,10 @@ export default function MatchCard({ match }: Props) {
         <span style={{ color: '#ff90b3' }}>{match.name}!</span>
       </h2>
 
+      <p style={{ fontSize: '0.95rem', color: '#ccc', marginBottom: '1rem' }}>
+        This pup’s tail hasn’t stopped wagging since we matched you two. 🐾
+      </p>
+
       <img
         src={match.img}
         alt={`Your match: ${match.name}`}

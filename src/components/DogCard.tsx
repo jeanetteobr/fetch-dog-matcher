@@ -46,6 +46,8 @@ export default function DogCard({ dog }: Props) {
 
       <button
         onClick={toggleFavorite}
+        title={favorited ? 'Remove from favorites 💔' : 'Add to favorites 🐾'}
+        aria-label={favorited ? 'Unfavorite dog' : 'Favorite dog'}
         style={{
           position: 'absolute',
           top: '10px',
