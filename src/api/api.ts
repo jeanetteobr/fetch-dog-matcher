@@ -57,3 +57,11 @@ export const fetchDogs = async ({
 
   return { dogs: ordered, total };
 };
+
+export const generateMatch = async (dogIds: string[]) => {
+  const matchRes = await api.post('/dogs/match', dogIds);
+  const matchId = matchRes.data.match;
+
+  const dogRes = await api.post('/dogs', [matchId]);
+  return dogRes.data[0]; // return the full matched dog object
+};

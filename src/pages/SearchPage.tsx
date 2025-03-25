@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { fetchBreeds, fetchDogs } from '../api/api';
+import { fetchBreeds, fetchDogs, generateMatch } from '../api/api';
 import { Dog, Breed } from '../types';
 import DogCard from '../components/DogCard';
+import MatchCard from '../components/MatchCard';
+import { useFavorites }from '../context/FavoritesContext';
 
 export default function SearchPage() {
     const { isAuthenticated } = useAuth();
@@ -19,6 +21,8 @@ export default function SearchPage() {
     const [dogs, setDogs] = useState<Dog[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [match, setMatch] = useState<Dog | null>(null);
+    const { favorites } = useFavorites();
 
     // Redirect if not logged in
     useEffect(() => {
@@ -72,11 +76,42 @@ export default function SearchPage() {
         return order === 'asc' ? 'A → Z' : 'Z → A';
     };
 
+    const handleGenerateMatch = async () => {
+        const ids = favorites.map((dog) => dog.id);
+        if (!ids.length) return;
+
+        try {
+            const result = await generateMatch(ids);
+            setMatch(result);
+        } catch (error) {
+            console.error('Failed to generate match:', error);
+        }
+    };
+
     return (
         <>
             <h1>Dog Browser 🐾</h1>
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
+            {favorites.length > 0 && (
+                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                    <button
+                        onClick={handleGenerateMatch}
+                        style={{
+                            padding: '0.75rem 1.5rem',
+                            fontSize: '1rem',
+                            borderRadius: '0.5rem',
+                            backgroundColor: '#f472b6',
+                            color: '#fff',
+                            border: 'none',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        🎯 Find My Match
+                    </button>
+                </div>
+            )}
+            {match && <MatchCard match={match} />}
 
             <form
                 style={{
