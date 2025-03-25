@@ -32,7 +32,7 @@ export const fetchDogs = async ({
   page = 1,
   limit = 25,
 }: FetchDogsOptions): Promise<{ dogs: Dog[]; total: number }> => {
-  const params: Record<string, any> = {
+  const params: Record<string, unknown> = {
     sort,
     size: limit,
     from: (page - 1) * limit, // ✨ Key pagination fix
