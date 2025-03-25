@@ -6,32 +6,36 @@ export const api = axios.create({
   withCredentials: true,
 });
 
-type SortParam = 'breed:asc' | 'breed:desc' | 'name:asc' | 'name:desc' | 'age:asc' | 'age:desc';
+type SortParam =
+  | 'breed:asc'
+  | 'breed:desc'
+  | 'name:asc'
+  | 'name:desc'
+  | 'age:asc'
+  | 'age:desc';
 
 interface FetchDogsOptions {
   breeds?: string[];
   sort?: SortParam;
-  page?: number;
-  limit?: number;
+  page?: number;      // still user-friendly for the UI
+  limit?: number;     // same — translates to "size"
 }
 
-// Fetch all breeds
 export const fetchBreeds = async (): Promise<Breed[]> => {
   const res = await api.get('/dogs/breeds');
   return res.data;
 };
 
-// Fetch sorted and filtered dogs
 export const fetchDogs = async ({
   breeds,
   sort = 'breed:asc',
   page = 1,
   limit = 25,
-}: FetchDogsOptions): Promise<Dog[]> => {
+}: FetchDogsOptions): Promise<{ dogs: Dog[]; total: number }> => {
   const params: Record<string, any> = {
     sort,
-    page,
-    limit,
+    size: limit,
+    from: (page - 1) * limit, // ✨ Key pagination fix
   };
 
   if (breeds?.length) {
@@ -40,16 +44,16 @@ export const fetchDogs = async ({
 
   const searchRes = await api.get('/dogs/search', { params });
   const ids: string[] = searchRes.data.resultIds;
+  const total: number = searchRes.data.total;
 
-  if (!ids || ids.length === 0) return [];
+  if (!ids?.length) return { dogs: [], total: 0 };
 
   const dogsRes = await api.post('/dogs', ids);
   const unorderedDogs: Dog[] = dogsRes.data;
 
-  // ✨ Reorder dogs to match resultIds
   const ordered = ids
     .map((id) => unorderedDogs.find((dog) => dog.id === id))
     .filter((d): d is Dog => d !== undefined);
 
-  return ordered;
+  return { dogs: ordered, total };
 };
